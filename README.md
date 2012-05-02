@@ -7,8 +7,23 @@ I already using in some projects, and maybe you can give a try if have a lot of 
 
 Soon i will to upload in nuget for a easy install.
 
-Dependencies:
--NPOI (Installing using nuget: Install-Package NPOI)
+##Dependencies:
+
+- NPOI (Installing using nuget: Install-Package NPOI)
+
+##How to use
+
+- Add the reference in your project.
+
+- Create a list of object an populate.
+
+       var persons = new List<Person>();
+       
+- Pass the list to SimpleExcelExport:
+
+	var result=SimpleExcelExport.ExportToExcel.ListToExcel<Person>(persons);
+
+- The library return the generated excel as a byte array.
 
 Any comment or idea for a new feature(or even better to send a pull request) contact me at:
-twitter: @majimenezp
+twitter: [@majimenezp](http://twitter.com/majimenezp)
