@@ -25,5 +25,16 @@ Soon i will to upload in nuget for a easy install.
 
 - The library return the generated excel as a byte array.
 
+##Column names and columns order
+The columns names and order by default are the property name and alphabetical order, if you want to set a custom name for the columns and order, you need to add an attribute to your properties in your POCO class, for example:
+
+	[ExcelExport("Last Name", order = 2)]
+        public string LastName { get; set; }
+
+        [ExcelExport("day of birth", order = 3)]
+        public DateTime BirthDay { get; set; }
+
+Where you set the column name with the first parameter and the column order with the named parameter "order".
+
 Any comment or idea for a new feature(or even better to send a pull request) contact me at:
 twitter: [@majimenezp](http://twitter.com/majimenezp)
