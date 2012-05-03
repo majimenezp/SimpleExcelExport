@@ -47,8 +47,10 @@ namespace SimpleExcelExport
             foreach (var column in orderedColumns)
             {
                 row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.STRING );
+                
                 var cellt = GetColumnCellType(column.PropType);
                 row.Cells[columnNumber].SetCellValue(column.ColumnName);
+                currentSheet.SetColumnWidth(columnNumber, (int)((column.ColumnName.Length*1.5) * 256));
                 ++columnNumber;
             }
         }
