@@ -19,7 +19,7 @@ namespace Tests
         /// <summary>
         /// No needed,but in case you need to set a column name and columns order
         /// </summary>
-        [ExcelExport("Name",order=1)]
+        [ExcelExport("Name", order = 1, backgroundColor = "{GetColor}")]
         public string Name { get; set; }
 
         [ExcelExport("Last Name", order = 2)]
@@ -34,10 +34,23 @@ namespace Tests
         [ExcelExport("Genre", order = 5)]
         public Sex Sex { get; set; }
 
-        [ExcelExport("Number of children", order = 7)]
+        [ExcelExport("Number of children", order= 7)]
         public int NumberOfChildren { get; set; }
 
-        [ExcelExport("Person's height", order = 6)]
+        [ExcelExport("Person's height", order = 6, backgroundColor = "{GetColor}")]
         public decimal Height { get; set; }
+
+        [ExcelExport("",ignore=true)]
+        public string RowColor { get; set; }
+
+        public string GetColor()
+        {
+            if (NumberOfChildren == 2)
+                return "";
+            else
+                return "Yellow";
+        }
+
+
     }
 }

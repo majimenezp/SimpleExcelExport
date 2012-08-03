@@ -31,7 +31,8 @@ namespace Tests.Steps
         [Then(@"export the list to a excel file located in:'(.*)'")]
         public void ThenExportTheListToAExcelFile(string fileLocation)
         {
-            var result=ExportToExcel.ListToExcel<Person>(persons);
+            var expExcel = new ExportToExcel();
+            var result = expExcel.ListToExcel<Person>(persons);
             string directory=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             using (BinaryWriter writer = new BinaryWriter(File.Create(fileLocation)))
             {

@@ -14,11 +14,19 @@ namespace SimpleExcelExport
     /// <summary>
     /// TODO: Update summary.
     /// </summary>
-    public class Column
+    internal class Column
     {
         public string ColumnName { get; set; }
         public string PropName { get; set; }
         public Type PropType { get; set; }
         public int ColumnOrder { get; set; }
+        public string CellColor { get; set; }
+        public bool Ignore { get; set; }
+        public Column()
+        {
+            CellColor = string.Empty;
+            Ignore = false;
+        }
     }
+    
 }

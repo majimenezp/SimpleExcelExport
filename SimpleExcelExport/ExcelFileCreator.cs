@@ -6,13 +6,16 @@ using NPOI.HSSF.UserModel;
 using System.IO;
 namespace SimpleExcelExport
 {
-    public class ExcelFileCreator
+    internal class ExcelFileCreator
     {
         private List<Column> columns;
         private HSSFWorkbook document;
         private HSSFSheet currentSheet;
         private int currentRowNumber=0;
+        private HSSFDataFormat cellsFormat;
         private NPOI.SS.UserModel.IRow currentRow;
+        private short DateFormat;
+        private short DecimalFormat;
         public ExcelFileCreator()
         {
             this.columns = new List<Column>();
@@ -29,13 +32,14 @@ namespace SimpleExcelExport
         private void CreateDocument()
         {
             document = new HSSFWorkbook();
+            cellsFormat = (HSSFDataFormat)document.CreateDataFormat();
+            DateFormat = 14;
             currentSheet = (HSSFSheet)document.CreateSheet();
         }
         public Stream SaveDocument()
         {
             MemoryStream memory = new MemoryStream();
             document.Write(memory);
-            document.Dispose();
             return memory;
         }
 
@@ -44,12 +48,12 @@ namespace SimpleExcelExport
             int columnNumber=0;
             var orderedColumns = columns.OrderBy(x => x.ColumnOrder);
             var row = currentSheet.CreateRow(currentRowNumber);
+            
             foreach (var column in orderedColumns)
             {
                 row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.STRING );
-                
                 var cellt = GetColumnCellType(column.PropType);
-                row.Cells[columnNumber].SetCellValue(column.ColumnName);
+                row.Cells[columnNumber].SetCellValue(column.ColumnName);                
                 currentSheet.SetColumnWidth(columnNumber, (int)((column.ColumnName.Length*1.5) * 256));
                 ++columnNumber;
             }
@@ -64,7 +68,7 @@ namespace SimpleExcelExport
                     cellType=NPOI.SS.UserModel.CellType.STRING;
                     break;
                 case "datetime":
-                    cellType = NPOI.SS.UserModel.CellType.STRING;
+                    cellType = NPOI.SS.UserModel.CellType.NUMERIC;
                     break;
                 case "int":
                 case "int32":
@@ -90,24 +94,37 @@ namespace SimpleExcelExport
             
         }
 
-        internal void CreateCellWithValue(int i, object value,Type valueType)
+        internal void CreateCellWithValue(int i, object value,Type valueType,System.Drawing.Color backgroundColor)
         {
+
             var cell=currentRow.CreateCell(i, GetColumnCellType(valueType));
+            HSSFCellStyle style = (HSSFCellStyle)document.CreateCellStyle();
+            if (!backgroundColor.IsEmpty)
+            {
+                style.FillForegroundColor = GetXLColour(backgroundColor);
+                style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+            }
             switch (valueType.Name.ToLowerInvariant())
             {
                 case "string":
                     cell.SetCellValue(value.ToString());
+                    style.DataFormat = HSSFDataFormat.GetBuiltinFormat("General");
                     break;
                 case "datetime":
                     cell.SetCellValue((DateTime)value);
+                    style.DataFormat = 14;
                     break;
                 case "int":
                 case "int32":
                 case "int64":
+                    cell.SetCellValue(Convert.ToDouble(value));
+                    style.DataFormat =HSSFDataFormat.GetBuiltinFormat("0");
+                    break;
                 case "decimal":
                 case "long":
                 case "double":
                     cell.SetCellValue(Convert.ToDouble(value));
+                    style.DataFormat = HSSFDataFormat.GetBuiltinFormat("0.00");
                     break;
                 case "boolean":
                 case "bool":
@@ -117,7 +134,36 @@ namespace SimpleExcelExport
                     cell.SetCellValue(value.ToString());
                     break;
             }
-            
+            cell.CellStyle = style;
         }
+
+        private short GetXLColour(System.Drawing.Color SystemColour)
+        {
+            HSSFPalette XlPalette = document.GetCustomPalette();
+            NPOI.HSSF.Util.HSSFColor XlColour = XlPalette.FindColor(SystemColour.R, SystemColour.G, SystemColour.B);
+            if (XlColour == null)
+            {
+                if (NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE < 255)
+                {
+                    if (NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE < 64)
+                    {
+                        NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE = 64;
+                    }
+                    NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE += 1;
+                    XlColour = XlPalette.AddColor(SystemColour.R, SystemColour.G, SystemColour.B);
+                }
+                else
+                {
+                    XlColour = XlPalette.FindSimilarColor(SystemColour.R, SystemColour.G, SystemColour.B);
+                }
+                return XlColour.GetIndex();
+            }
+            else
+            {
+                
+                return XlColour.GetIndex();
+            }
+        }
+
     }
 }
