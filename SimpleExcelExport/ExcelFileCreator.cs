@@ -16,6 +16,7 @@ namespace SimpleExcelExport
         private NPOI.SS.UserModel.IRow currentRow;
         private short DateFormat;
         private short DecimalFormat;
+        private Dictionary<string, HSSFCellStyle> cellStyles=new Dictionary<string,HSSFCellStyle>();
         public ExcelFileCreator()
         {
             this.columns = new List<Column>();
@@ -41,6 +42,11 @@ namespace SimpleExcelExport
             MemoryStream memory = new MemoryStream();
             document.Write(memory);
             return memory;
+        }
+
+        public HSSFWorkbook GetDocument()
+        {
+            return document;
         }
 
         private void CreateHeader()
@@ -91,40 +97,77 @@ namespace SimpleExcelExport
         {
             ++currentRowNumber;
             currentRow=currentSheet.CreateRow(currentRowNumber);
-            
         }
+
+        public int LastRownNumber { get { return currentRowNumber; } }
 
         internal void CreateCellWithValue(int i, object value,Type valueType,System.Drawing.Color backgroundColor)
         {
-
+            HSSFCellStyle style;
+            string valueTypeName=valueType.Name.ToLowerInvariant();
             var cell=currentRow.CreateCell(i, GetColumnCellType(valueType));
-            HSSFCellStyle style = (HSSFCellStyle)document.CreateCellStyle();
-            if (!backgroundColor.IsEmpty)
+            string styleId=valueTypeName + (backgroundColor.IsEmpty?string.Empty:backgroundColor.ToArgb().ToString());
+            if(cellStyles.ContainsKey(styleId))
             {
-                style.FillForegroundColor = GetXLColour(backgroundColor);
-                style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+                style=cellStyles[styleId];
             }
-            switch (valueType.Name.ToLowerInvariant())
+            else{
+                style= (HSSFCellStyle)document.CreateCellStyle();
+                if (!backgroundColor.IsEmpty)
+                {
+                    style.FillForegroundColor = GetXLColour(backgroundColor);
+                    style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+                }
+                switch (valueTypeName)
+                {
+                    case "string":
+                        style.DataFormat = HSSFDataFormat.GetBuiltinFormat("General");
+                        break;
+                    case "datetime":
+                        style.DataFormat = 14;
+                        break;
+                    case "int":
+                    case "int32":
+                    case "int64":
+                        style.DataFormat = HSSFDataFormat.GetBuiltinFormat("0");
+                        break;
+                    case "decimal":
+                    case "long":
+                    case "double":
+                        style.DataFormat = HSSFDataFormat.GetBuiltinFormat("0.00");
+                        break;
+                    default:
+                        style.DataFormat = HSSFDataFormat.GetBuiltinFormat("General");
+                        break;
+                }
+                cellStyles.Add(styleId, style);
+            }
+            
+            
+            switch (valueTypeName)
             {
                 case "string":
                     cell.SetCellValue(value.ToString());
-                    style.DataFormat = HSSFDataFormat.GetBuiltinFormat("General");
                     break;
                 case "datetime":
-                    cell.SetCellValue((DateTime)value);
-                    style.DataFormat = 14;
+                    if (((DateTime)value) == DateTime.MinValue)
+                    {
+                        cell.SetCellValue(string.Empty);
+                    }
+                    else
+                    {
+                        cell.SetCellValue((DateTime)value);
+                    }
                     break;
                 case "int":
                 case "int32":
                 case "int64":
                     cell.SetCellValue(Convert.ToDouble(value));
-                    style.DataFormat =HSSFDataFormat.GetBuiltinFormat("0");
                     break;
                 case "decimal":
                 case "long":
                 case "double":
                     cell.SetCellValue(Convert.ToDouble(value));
-                    style.DataFormat = HSSFDataFormat.GetBuiltinFormat("0.00");
                     break;
                 case "boolean":
                 case "bool":

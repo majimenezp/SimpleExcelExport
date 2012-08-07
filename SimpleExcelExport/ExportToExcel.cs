@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using NPOI.HSSF.UserModel;
 
 namespace SimpleExcelExport
 {
     public class ExportToExcel
     {
+        private ExcelFileCreator globalExcelCreator;
+        private int lastRowNumber=0;
         public static Regex regexFunctionColor = new Regex(
         "(?:{)(.*)(?:})",
         RegexOptions.IgnoreCase
@@ -16,6 +19,8 @@ namespace SimpleExcelExport
         | RegexOptions.IgnorePatternWhitespace
         | RegexOptions.Compiled);
         public static Regex regexRgbColor = new Regex("(\\d{1,3}),(\\d{1,3}),(\\d{1,3})", RegexOptions.IgnoreCase| RegexOptions.CultureInvariant| RegexOptions.IgnorePatternWhitespace| RegexOptions.Compiled);
+
+        public int LastRowNumber { get { return lastRowNumber; } }
 
         public byte[] ListToExcel<T>(List<T> list)
         {
@@ -32,9 +37,27 @@ namespace SimpleExcelExport
             }
             
             ProcessRows<T>(list, columns, excelCreator);
+            lastRowNumber = excelCreator.LastRownNumber;
             output = (MemoryStream)excelCreator.SaveDocument();
             return output.ToArray();
         }
+
+        public HSSFWorkbook ProcessListToExcel<T>(List<T> list)
+        {
+            var columns = GetTypeDefinition(typeof(T));
+            try
+            {
+                globalExcelCreator = new ExcelFileCreator(columns);
+            }
+            catch (Exception ex1)
+            {
+                globalExcelCreator = new ExcelFileCreator(columns);
+            }
+            ProcessRows<T>(list, columns, globalExcelCreator);
+            lastRowNumber = globalExcelCreator.LastRownNumber;
+            return globalExcelCreator.GetDocument();
+        }
+
 
         private void ProcessRows<T>(List<T> list, List<Column> columns, ExcelFileCreator excel)
         {
