@@ -22,10 +22,24 @@ namespace SimpleExcelExport
         public int ColumnOrder { get; set; }
         public string CellColor { get; set; }
         public bool Ignore { get; set; }
+        public bool HFontBold { get; set; }  //Header property
+        public string HFontColor { get; set; } //Header property
+        public string HBackColor { get; set; } //Header property
+        
+
         public Column()
         {
             CellColor = string.Empty;
             Ignore = false;
+        }
+
+        public Column(bool headerFontBold, string headerFontColor, string headerBackColor)
+        {
+            CellColor = string.Empty;
+            Ignore = false;
+            HFontBold = headerFontBold;
+            HFontColor = headerFontColor;
+            HBackColor = headerBackColor;
         }
     }
     

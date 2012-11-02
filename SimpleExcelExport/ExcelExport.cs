@@ -22,12 +22,19 @@ namespace SimpleExcelExport
         public string backgroundColor;
         public int order;
         public bool ignore;
+        public bool headerBold;
+        public string headerbackgroundColor;
+        public string headerFontColor;
+
         public ExcelExport(string name)
         {
             this.name = name;
             this.order = 0;
             this.backgroundColor = string.Empty;
             this.ignore = false;
+            this.headerBold = false;
+            this.headerbackgroundColor = string.Empty;
+            this.headerFontColor = string.Empty;
         }
         public string GetName()
         {
@@ -41,5 +48,19 @@ namespace SimpleExcelExport
         {
             return ignore;
         }
+
+        public bool GetHeaderBold()
+        {
+            return headerBold;
+        }
+        public string GetHeaderBackgroundColor()
+        {
+            return headerbackgroundColor;
+        }
+        public string GetHeaderFontColor()
+        {
+            return headerFontColor;
+        }
+
     }
 }

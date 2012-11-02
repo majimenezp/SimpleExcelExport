@@ -54,15 +54,47 @@ namespace SimpleExcelExport
             int columnNumber=0;
             var orderedColumns = columns.OrderBy(x => x.ColumnOrder);
             var row = currentSheet.CreateRow(currentRowNumber);
+            ExportToExcel exportToExcel = new ExportToExcel();
             
             foreach (var column in orderedColumns)
             {
-                row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.STRING );
+                row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.STRING);
                 var cellt = GetColumnCellType(column.PropType);
-                row.Cells[columnNumber].SetCellValue(column.ColumnName);                
-                currentSheet.SetColumnWidth(columnNumber, (int)((column.ColumnName.Length*1.5) * 256));
+                row.Cells[columnNumber].SetCellValue(column.ColumnName);
+                currentSheet.SetColumnWidth(columnNumber, (int)((column.ColumnName.Length * 1.5) * 256));
+                SetHeaderOptions(column, row, columnNumber, exportToExcel);
                 ++columnNumber;
             }
+        }
+
+
+        private void SetHeaderOptions(SimpleExcelExport.Column column, NPOI.SS.UserModel.IRow row, int columnNumber, ExportToExcel exportToExcel)
+        {
+            HSSFCellStyle style = (HSSFCellStyle)document.CreateCellStyle();
+            var font = document.CreateFont();
+            if (column.HFontBold)
+            {
+                font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
+            }
+            if (!string.IsNullOrEmpty(column.HFontColor))
+            {
+                System.Drawing.Color fontColor = exportToExcel.GetColor(column.ColumnName, column.HFontColor, typeof(string));
+                if (!fontColor.IsEmpty)
+                {
+                    font.Color = GetXLColour(fontColor);
+                }
+            }
+            if (!string.IsNullOrEmpty(column.HBackColor))
+            {
+                System.Drawing.Color backgroundColor = exportToExcel.GetColor(column.ColumnName, column.HBackColor, typeof(string));
+                if (!backgroundColor.IsEmpty)
+                {
+                    style.FillForegroundColor = GetXLColour(backgroundColor);
+                    style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+                }
+            }
+            style.SetFont(font);
+            row.Cells[columnNumber].CellStyle = style;
         }
 
         private NPOI.SS.UserModel.CellType GetColumnCellType(Type type)

@@ -17,7 +17,7 @@ namespace Tests.Steps
             persons = new List<Person>();
             foreach (var row in table.Rows)
             {
-                var tmp=new Person();
+                var tmp = new Person();
                 tmp.Name = row["Name"];
                 tmp.LastName = row["LastName"];
                 tmp.BirthDay = Convert.ToDateTime(row["BirthDay"]);
@@ -33,7 +33,7 @@ namespace Tests.Steps
         {
             var expExcel = new ExportToExcel();
             var result = expExcel.ListToExcel<Person>(persons);
-            string directory=Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             using (BinaryWriter writer = new BinaryWriter(File.Create(fileLocation)))
             {
                 writer.Write(result, 0, result.Length);
@@ -42,5 +42,18 @@ namespace Tests.Steps
             }
         }
 
+        [Then(@"export the list with header format to a excel file located in:'(.*)'")]
+        public void ThenExportTheListToAExcelFileWithHeaderFormat(string fileLocation)
+        {
+            var expExcel = new ExportToExcel(true, "White", "Blue");
+            var result = expExcel.ListToExcel<Person>(persons);
+            string directory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            using (BinaryWriter writer = new BinaryWriter(File.Create(fileLocation)))
+            {
+                writer.Write(result, 0, result.Length);
+                writer.Flush();
+                writer.Close();
+            }
+        }
     }
 }
