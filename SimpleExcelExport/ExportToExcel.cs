@@ -19,8 +19,21 @@ namespace SimpleExcelExport
         | RegexOptions.IgnorePatternWhitespace
         | RegexOptions.Compiled);
         public static Regex regexRgbColor = new Regex("(\\d{1,3}),(\\d{1,3}),(\\d{1,3})", RegexOptions.IgnoreCase| RegexOptions.CultureInvariant| RegexOptions.IgnorePatternWhitespace| RegexOptions.Compiled);
+        private Column initColumn;
 
         public int LastRowNumber { get { return lastRowNumber; } }
+
+        public ExportToExcel()
+        {
+        }
+
+        public ExportToExcel(bool headerBold, string headerFontColor="", string headerbackgroundColor="")
+        {
+            initColumn = new Column();
+            initColumn.HFontBold = headerBold;
+            initColumn.HFontColor = headerFontColor;
+            initColumn.HBackColor = headerbackgroundColor;
+        }
 
         public byte[] ListToExcel<T>(List<T> list)
         {
@@ -29,7 +42,20 @@ namespace SimpleExcelExport
             var columns = GetTypeDefinition(typeof(T));
             try
             {
-                excelCreator = new ExcelFileCreator(columns);
+                if (initColumn == null)
+                {
+                    excelCreator = new ExcelFileCreator(columns);
+                }
+                else
+                {
+                    foreach (var item in columns)
+                    {
+                        item.HFontBold = initColumn.HFontBold;
+                        item.HFontColor = initColumn.HFontColor;
+                        item.HBackColor = initColumn.HBackColor;
+                    }
+                    excelCreator = new ExcelFileCreator(columns);
+                }
             }
             catch (Exception ex1)
             {
@@ -71,7 +97,7 @@ namespace SimpleExcelExport
                 foreach (var column in orderedColumns)
                 {
                     var value = type.GetProperty(column.PropName).GetValue(element, null);
-                    System.Drawing.Color backgroundColor = GetColor(element, column, type);
+                    System.Drawing.Color backgroundColor = GetColor(element, column.CellColor, type);
 
                     excel.CreateCellWithValue(columnNumber, value, column.PropType, backgroundColor);
                     ++columnNumber;
@@ -80,16 +106,16 @@ namespace SimpleExcelExport
             }
         }
 
-        private System.Drawing.Color GetColor(object element, Column column, Type type)
+        internal System.Drawing.Color GetColor(object element, string color, Type type)
         {
             System.Drawing.Color resultColor = System.Drawing.Color.Empty;
-            if (!string.IsNullOrEmpty(column.CellColor))
+            if (!string.IsNullOrEmpty(color))
             {
-                Match functionColor = regexFunctionColor.Match(column.CellColor);
-                
-                if (regexFunctionColor.IsMatch(column.CellColor)) // have a reference to a function,execute function
+                Match functionColor = regexFunctionColor.Match(color);
+
+                if (regexFunctionColor.IsMatch(color)) // have a reference to a function,execute function
                 {
-                    var functionName = regexFunctionColor.Split(column.CellColor)[1];
+                    var functionName = regexFunctionColor.Split(color)[1];
                     var methodInfo=type.GetMethod(functionName);
                     var value = (string)methodInfo.Invoke(element, null);
                     if (regexRgbColor.IsMatch(value))
@@ -105,13 +131,13 @@ namespace SimpleExcelExport
                         resultColor = System.Drawing.Color.FromName(value);
                     }
                 }
-                else if(regexRgbColor.IsMatch(column.CellColor))
+                else if (regexRgbColor.IsMatch(color))
                 {
-                    resultColor = ProcessColorByRGB(column.CellColor);
+                    resultColor = ProcessColorByRGB(color);
                 }
                 else
                 {
-                    resultColor=System.Drawing.Color.FromName(column.CellColor);
+                    resultColor = System.Drawing.Color.FromName(color);
                 }
                 return resultColor;
             }
@@ -154,6 +180,9 @@ namespace SimpleExcelExport
                         tmp.ColumnName = attribute.GetName();
                         tmp.ColumnOrder = attribute.order;
                         tmp.CellColor = attribute.GetBackgroundColor();
+                        tmp.HFontBold = attribute.GetHeaderBold();
+                        tmp.HBackColor = attribute.GetHeaderBackgroundColor();
+                        tmp.HFontColor = attribute.GetHeaderFontColor();
                         tmp.Ignore=attribute.ignore;
                     }
                 }

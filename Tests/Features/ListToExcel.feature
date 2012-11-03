@@ -10,4 +10,4 @@ Scenario: Export list of person
 	| Maria | Gomez    | 02/02/1980 | Panama  | Female | 2                | 1.60   |
 	| John  | Doe      | 03/03/1975 | USA     | Male   | 1                | 1.90   |
 	Then export the list to a excel file located in:'C:\output.xls'
-
+	Then export the list with header format to a excel file located in:'C:\outputh.xls'
