@@ -28,13 +28,13 @@ namespace Tests
         [ExcelExport("day of birth", order = 3)]
         public DateTime BirthDay { get; set; }
 
-        [ExcelExport("Country", order = 4)]
+        [ExcelExport("Country", order = 4, headerBold = true, headerbackgroundColor="Red", headerFontColor="White")]
         public string Country { get; set; }
 
         [ExcelExport("Genre", order = 5)]
         public Sex Sex { get; set; }
 
-        [ExcelExport("Number of children", order= 7)]
+        [ExcelExport("Number of children", order = 7, headerFontColor = "GREEN")]
         public int NumberOfChildren { get; set; }
 
         [ExcelExport("Person's height", order = 6, backgroundColor = "{GetColor}")]
