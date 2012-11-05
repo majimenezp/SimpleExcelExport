@@ -28,13 +28,14 @@ Soon i will to upload in nuget for a easy install.
 ##Column names and columns order
 The columns names and order by default are the property name and alphabetical order, if you want to set a custom name for the columns and order, you need to add an attribute to your properties in your POCO class, for example:
 
-	[ExcelExport("Last Name", order = 2)]
+	[ExcelExport("Last Name", order = 2,HFontBold=true,HFontColor ="White",HBackColor="Red")]
         public string LastName { get; set; }
 
         [ExcelExport("day of birth", order = 3)]
         public DateTime BirthDay { get; set; }
 
 Where you set the column name with the first parameter and the column order with the named parameter "order".
+Also(thanks to @rivuc) you can define font weight(bold), cell background color and font(foreground) color.
 
 Any comment or idea for a new feature(or even better to send a pull request) contact me at:
 twitter: [@majimenezp](http://twitter.com/majimenezp)
