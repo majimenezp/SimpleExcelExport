@@ -7,9 +7,15 @@ I already using in some projects, and maybe you can give a try if have a lot of 
 
 Soon i will to upload in nuget for a easy install.
 
+##Install
+With nuget:
+- Install-Package SimpleExcelExport
+
+(https://nuget.org/packages/SimpleExcelExport)
+
 ##Dependencies:
 
-- NPOI (Installing using nuget: Install-Package NPOI)
+- NPOI
 
 ##How to use
 
