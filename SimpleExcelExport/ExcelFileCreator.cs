@@ -14,8 +14,6 @@ namespace SimpleExcelExport
         private int currentRowNumber=0;
         private HSSFDataFormat cellsFormat;
         private NPOI.SS.UserModel.IRow currentRow;
-        private short DateFormat;
-        private short DecimalFormat;
         private Dictionary<string, HSSFCellStyle> cellStyles=new Dictionary<string,HSSFCellStyle>();
         public ExcelFileCreator()
         {
@@ -34,7 +32,6 @@ namespace SimpleExcelExport
         {
             document = new HSSFWorkbook();
             cellsFormat = (HSSFDataFormat)document.CreateDataFormat();
-            DateFormat = 14;
             currentSheet = (HSSFSheet)document.CreateSheet();
         }
         public Stream SaveDocument()
@@ -58,7 +55,7 @@ namespace SimpleExcelExport
             
             foreach (var column in orderedColumns)
             {
-                row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.STRING);
+                row.CreateCell(columnNumber, NPOI.SS.UserModel.CellType.String);
                 var cellt = GetColumnCellType(column.PropType);
                 row.Cells[columnNumber].SetCellValue(column.ColumnName);
                 currentSheet.SetColumnWidth(columnNumber, (int)((column.ColumnName.Length * 1.5) * 256));
@@ -74,7 +71,7 @@ namespace SimpleExcelExport
             var font = document.CreateFont();
             if (column.HFontBold)
             {
-                font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.BOLD;
+                font.Boldweight = (short)NPOI.SS.UserModel.FontBoldWeight.Bold;
             }
             if (!string.IsNullOrEmpty(column.HFontColor))
             {
@@ -90,7 +87,7 @@ namespace SimpleExcelExport
                 if (!backgroundColor.IsEmpty)
                 {
                     style.FillForegroundColor = GetXLColour(backgroundColor);
-                    style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+                    style.FillPattern = NPOI.SS.UserModel.FillPattern.SolidForeground;
                 }
             }
             style.SetFont(font);
@@ -99,14 +96,14 @@ namespace SimpleExcelExport
 
         private NPOI.SS.UserModel.CellType GetColumnCellType(Type type)
         {
-            NPOI.SS.UserModel.CellType cellType= NPOI.SS.UserModel.CellType.STRING;
+            NPOI.SS.UserModel.CellType cellType= NPOI.SS.UserModel.CellType.String;
             switch (type.Name.ToLowerInvariant())
             {
                 case "string":
-                    cellType=NPOI.SS.UserModel.CellType.STRING;
+                    cellType=NPOI.SS.UserModel.CellType.String;
                     break;
                 case "datetime":
-                    cellType = NPOI.SS.UserModel.CellType.NUMERIC;
+                    cellType = NPOI.SS.UserModel.CellType.Numeric;
                     break;
                 case "int":
                 case "int32":
@@ -114,11 +111,11 @@ namespace SimpleExcelExport
                 case "decimal":
                 case "long":
                 case "double":
-                    cellType = NPOI.SS.UserModel.CellType.NUMERIC;
+                    cellType = NPOI.SS.UserModel.CellType.Numeric;
                     break;
                 case "boolean":
                 case "bool":
-                    cellType = NPOI.SS.UserModel.CellType.BOOLEAN;
+                    cellType = NPOI.SS.UserModel.CellType.Boolean;
                     break;
             }
             return cellType;
@@ -148,7 +145,7 @@ namespace SimpleExcelExport
                 if (!backgroundColor.IsEmpty)
                 {
                     style.FillForegroundColor = GetXLColour(backgroundColor);
-                    style.FillPattern = NPOI.SS.UserModel.FillPatternType.SOLID_FOREGROUND;
+                    style.FillPattern = NPOI.SS.UserModel.FillPattern.SolidForeground;
                 }
                 switch (valueTypeName)
                 {
@@ -216,28 +213,8 @@ namespace SimpleExcelExport
         {
             HSSFPalette XlPalette = document.GetCustomPalette();
             NPOI.HSSF.Util.HSSFColor XlColour = XlPalette.FindColor(SystemColour.R, SystemColour.G, SystemColour.B);
-            if (XlColour == null)
-            {
-                if (NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE < 255)
-                {
-                    if (NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE < 64)
-                    {
-                        NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE = 64;
-                    }
-                    NPOI.HSSF.Record.PaletteRecord.STANDARD_PALETTE_SIZE += 1;
-                    XlColour = XlPalette.AddColor(SystemColour.R, SystemColour.G, SystemColour.B);
-                }
-                else
-                {
-                    XlColour = XlPalette.FindSimilarColor(SystemColour.R, SystemColour.G, SystemColour.B);
-                }
-                return XlColour.GetIndex();
-            }
-            else
-            {
-                
-                return XlColour.GetIndex();
-            }
+            XlColour = XlColour ?? XlPalette.AddColor(SystemColour.R, SystemColour.G, SystemColour.B);
+            return XlColour.GetIndex();
         }
 
     }

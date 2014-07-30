@@ -57,7 +57,7 @@ namespace SimpleExcelExport
                     excelCreator = new ExcelFileCreator(columns);
                 }
             }
-            catch (Exception ex1)
+            catch
             {
                 excelCreator = new ExcelFileCreator(columns);
             }
@@ -75,7 +75,7 @@ namespace SimpleExcelExport
             {
                 globalExcelCreator = new ExcelFileCreator(columns);
             }
-            catch (Exception ex1)
+            catch
             {
                 globalExcelCreator = new ExcelFileCreator(columns);
             }
