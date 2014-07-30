@@ -169,7 +169,7 @@ namespace SimpleExcelExport
                 var tmp = new Column();
                 var attrs = System.Attribute.GetCustomAttributes(prop);
                 tmp.PropName = prop.Name;
-                tmp.PropType = prop.PropertyType;
+                tmp.PropType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 tmp.ColumnName = prop.Name;
                 tmp.ColumnOrder = 0;
                 foreach (var attr in attrs)
