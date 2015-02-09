@@ -27,7 +27,11 @@ With nuget:
        
 - Pass the list to SimpleExcelExport:
 
-	var result=SimpleExcelExport.ExportToExcel.ListToExcel<Person>(persons);
+	var result = SimpleExcelExport.ExportToExcel().ListToExcel(persons);
+
+- (Optional) return file from web controller:
+	
+	return File(result, "application/vnd.ms-excel", "Report.xls");
 
 - The library return the generated excel as a byte array.
 

@@ -57,7 +57,7 @@ namespace SimpleExcelExport
                     excelCreator = new ExcelFileCreator(columns);
                 }
             }
-            catch (Exception ex1)
+            catch
             {
                 excelCreator = new ExcelFileCreator(columns);
             }
@@ -75,7 +75,7 @@ namespace SimpleExcelExport
             {
                 globalExcelCreator = new ExcelFileCreator(columns);
             }
-            catch (Exception ex1)
+            catch
             {
                 globalExcelCreator = new ExcelFileCreator(columns);
             }
@@ -169,7 +169,7 @@ namespace SimpleExcelExport
                 var tmp = new Column();
                 var attrs = System.Attribute.GetCustomAttributes(prop);
                 tmp.PropName = prop.Name;
-                tmp.PropType = prop.PropertyType;
+                tmp.PropType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 tmp.ColumnName = prop.Name;
                 tmp.ColumnOrder = 0;
                 foreach (var attr in attrs)
