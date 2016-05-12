@@ -176,7 +176,7 @@ namespace SimpleExcelExport
             switch (valueTypeName)
             {
                 case "string":
-                    cell.SetCellValue(value.ToString());
+                    cell.SetCellValue(value != null ? value.ToString() : "");
                     break;
                 case "datetime":
                     if (((DateTime)value) == DateTime.MinValue)
@@ -203,7 +203,7 @@ namespace SimpleExcelExport
                     cell.SetCellValue((bool)value);
                     break;
                 default:
-                    cell.SetCellValue(value.ToString());
+                    cell.SetCellValue(value != null ? value.ToString() : "");
                     break;
             }
             cell.CellStyle = style;
@@ -214,7 +214,7 @@ namespace SimpleExcelExport
             HSSFPalette XlPalette = document.GetCustomPalette();
             NPOI.HSSF.Util.HSSFColor XlColour = XlPalette.FindColor(SystemColour.R, SystemColour.G, SystemColour.B);
             XlColour = XlColour ?? XlPalette.AddColor(SystemColour.R, SystemColour.G, SystemColour.B);
-            return XlColour.GetIndex();
+            return XlColour.Indexed;
         }
 
     }
