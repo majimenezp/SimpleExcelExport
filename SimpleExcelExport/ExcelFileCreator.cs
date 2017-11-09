@@ -214,7 +214,7 @@ namespace SimpleExcelExport
             HSSFPalette XlPalette = document.GetCustomPalette();
             NPOI.HSSF.Util.HSSFColor XlColour = XlPalette.FindColor(SystemColour.R, SystemColour.G, SystemColour.B);
             XlColour = XlColour ?? XlPalette.AddColor(SystemColour.R, SystemColour.G, SystemColour.B);
-            return XlColour.GetIndex();
+            return XlColour.Indexed;
         }
 
     }
